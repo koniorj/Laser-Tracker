@@ -1,26 +1,32 @@
 import cv2
 from my_exceptions import NoCameraFootage
 
-CAMERA_INDEX = 1
+CAMERA_1_ID = 1
+CAMERA_2_ID = 2
 KEY_ESC = 27
 
 def main():
     # CAP_DSHOW - DirectShow, it overwrites the standard way of Windows opening
     # camera feed with MSMF, which is incompatible with Iriun
-    capture = cv2.VideoCapture(CAMERA_INDEX, cv2.CAP_DSHOW)
+    left_capture = cv2.VideoCapture(CAMERA_1_ID, cv2.CAP_DSHOW)
+    right_capture = cv2.VideoCapture(CAMERA_2_ID, cv2.CAP_DSHOW)
 
     try:
         while True:
-            return_value, frame = capture.read()
-            if not return_value:
+            return_value_left, left_frame = left_capture.read()
+            return_value_right, right_frame = right_capture.read()
+            if not return_value_left:
+                raise NoCameraFootage()
+            if not return_value_right:
                 raise NoCameraFootage()
 
-            cv2.imshow("Live camera", frame)
+            cv2.imshow("Live camera left", left_frame)
+            cv2.imshow("Live camera right", right_frame)
 
             if cv2.waitKey(1) & 0xFF == KEY_ESC:
                 break
     finally: 
-        capture.release()
+        left_capture.release()
         cv2.destroyAllWindows()
         print("All resources freed.")
 
